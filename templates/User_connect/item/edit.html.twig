@@ -1,0 +1,13 @@
+{% extends 'User_connect/base_connect.html.twig' %}
+
+{% block title %}Edit Item{% endblock %}
+
+{% block body %}
+    <h1>Edit Item</h1>
+
+    {{ include('User_connect/item/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('item_index', {'user_id':user.id}) }}">back to list</a>
+
+    {{ include('User_connect/item/_delete_form.html.twig') }}
+{% endblock %}
