@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity;
 
-use App\Controller\ItemController;
 use App\Entity\Item;
 use App\Entity\TodoList;
 use App\Entity\EmailSenderService;
@@ -18,15 +17,15 @@ class TodoListTest extends TestCase
     protected function setUp(): void
     {
 
+        $this->emailSenderService = $this->getMockBuilder(EmailSenderService::class)
+        ->onlyMethods(['sendEmail'])
+        ->getMock();
+
         $this->todoList = new TodoList();
         $nbr_items = 7;
         for($i=0 ; $i<$nbr_items ; $i++){
             $this->todoList->addItem($this->createItem($i));
         }
-
-        $this->emailSenderService = $this->getMockBuilder(EmailSenderService::class)
-            ->onlyMethods(['sendEmail'])
-            ->getMock();
 
         parent::setUp();
     }
@@ -38,7 +37,9 @@ class TodoListTest extends TestCase
 
     public function testNotValidDueToItemsTooBig()
     {
-        for($i=7 ; $i<11 ; $i++){
+        $this->todoList->setEmailSenderService($this->emailSenderService);
+
+        for($i=7 ; $i<12 ; $i++){
             $this->todoList->addItem($this->createItem($i));
         }
 
@@ -48,47 +49,65 @@ class TodoListTest extends TestCase
 
     public function testIsAddItemNominal()
     {
-        $item8 = $this->createItem(8);
-        $this->todoList->addItem($item8);
-        $this->assertContains($item8, $this->todoList->getItems());
+        $this->todoList->setEmailSenderService($this->emailSenderService);
+
+        $item = $this->createItem(7);
+        $this->todoList->addItem($item);
+        $this->assertContains($item, $this->todoList->getItems());
+    }
+
+    public function testShouldSendEmailOnAddingEighthItem()
+    {
+        $this->todoList->setEmailSenderService($this->emailSenderService);
+
+        $this->emailSenderService->expects($this->once())
+            ->method('sendEmail');
+
+        $item = $this->createItem(7);
+        $this->todoList->addItem($item);
     }
 
     public function testIsAddItemNominal8()
     {
+        $this->todoList->setEmailSenderService($this->emailSenderService);
 
-        $item8 = $this->createItem(8);
-        $this->todoList->addItem($item8);
-        $this->emailSenderService->expects($this->once())
-            ->method('sendEmail');
+        $item = $this->createItem(8);
+        $this->todoList->addItem($item);
 
-        $this->assertContains($item8, $this->todoList->getItems());
+        $this->assertContains($item, $this->todoList->getItems());
     }
 
-    public function testNotAddItemDueToItemContain()
+    public function testNotAddingItemDueToItemAlreadyExists()
     {
-        $item7 = $this->createItem(7);
-        $this->todoList->addItem($item7);
+        $this->todoList->setEmailSenderService($this->emailSenderService);
+
+        $item = $this->createItem(6);
+        $this->todoList->addItem($item);
         $this->assertCount(7, $this->todoList->getItems());
     }
 
     public function testNotAddItemDueToFast()
     {
-        $item8 = $this->createItem(8);
+        $this->todoList->setEmailSenderService($this->emailSenderService);
+
+        $item8 = $this->createItem(7);
         $this->todoList->addItem($item8);
 
-        $item9 = $this->createItem(9);
+        $item9 = $this->createItem(8);
         $item9->setDateAtCreated($item8->getDateAtCreated());
         $this->todoList->addItem($item9);
 
         $this->assertCount(8, $this->todoList->getItems());
     }
 
-    private function createItem($i){
+    private function createItem($i): Item{
         $item = new Item();
-        $item->setName("name_item"+$i);
-        $item->setContent("content_item"+$i);
+        $item->setName("name_item_{$i}");
+        $item->setContent("content_item_{$i}");
         $item->setDateAtCreated(Carbon::now()->addMinutes(31*$i));
         $item->setTodoList($this->todoList);
+
+        return $item;
     }
 
 

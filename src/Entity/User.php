@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Carbon\Carbon;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -70,7 +69,7 @@ class User implements UserInterface
             && (8<=strlen($this->password)) && (strlen($this->password)<=40)
             && !is_null($this->todoList)
             && !is_null($this->dateNaissance)
-            && $this->dateNaissance->addYears(13)->isBefore(Carbon::now());
+            && Carbon::parse($this->dateNaissance)->addYears(13)->isBefore(Carbon::now());
     }
 
     public function getId(): ?int
@@ -95,7 +94,7 @@ class User implements UserInterface
      *
      * @see UserInterface
      */
-    public function getUsername(): string
+    public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }

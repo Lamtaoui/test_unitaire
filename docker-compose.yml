@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 
 x-cache-from:
   - &app-cache-from
@@ -19,10 +19,7 @@ services:
       - target: 5432
         published: 5432
         protocol: tcp
-  adminer:
-    image: adminer:4.8.1
-    ports:
-      - 8083:8080
+
   php:
     image: php:8.0-fpm
     build:

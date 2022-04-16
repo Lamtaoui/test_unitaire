@@ -3,9 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
-use Carbon\Carbon;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Driver;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

@@ -4,7 +4,6 @@ namespace App\Tests\Entity;
 
 use App\Entity\Item;
 use App\Entity\TodoList;
-use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon;
 
@@ -12,8 +11,6 @@ class ItemTest extends TestCase
 {
 
     private Item $item;
-    private ArrayCollection $items;
-
 
     protected function setUp(): void
     {
